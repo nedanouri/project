@@ -23,9 +23,7 @@ RUN export XDEBUG_MODE=off; composer self-update --stable || composer self-updat
 
 ### DDEV-injected extra content
 RUN mkdir -p /home/$username && \
-    chown $username /home/$username && \
-    touch /home/$username/.pgpass && \
-    chmod 600 /home/$username/.pgpass
+    chown $username /home/$username
 
 ENV NVM_DIR=/home/$username/.nvm
 
