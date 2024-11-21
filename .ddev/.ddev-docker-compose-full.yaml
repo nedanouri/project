@@ -22,7 +22,7 @@ services:
         command: []
         container_name: ddev-projectst-db
         environment:
-            COLUMNS: "243"
+            COLUMNS: "245"
             DDEV_DATABASE: mariadb:10.11
             DDEV_DATABASE_FAMILY: mysql
             DDEV_HOSTNAME: projectst.ddev.site
@@ -39,7 +39,7 @@ services:
             GOOS: darwin
             HOST_DOCKER_INTERNAL_IP: ""
             IS_DDEV_PROJECT: "true"
-            LINES: "57"
+            LINES: "55"
             MYSQL_HISTFILE: /mnt/ddev-global-cache/mysqlhistory/projectst-db/mysql_history
             MYSQL_PWD: db
             PGDATABASE: db
@@ -113,7 +113,7 @@ services:
             - /pre-start.sh
         container_name: ddev-projectst-web
         environment:
-            COLUMNS: "243"
+            COLUMNS: "245"
             COREPACK_HOME: /mnt/ddev-global-cache/corepack
             DDEV_COMPOSER_ROOT: /var/www/html
             DDEV_DATABASE: mariadb:10.11
@@ -146,7 +146,7 @@ services:
             HTTP_EXPOSE: 80:80,8025:8025
             HTTPS_EXPOSE: 443:80,8026:8025
             IS_DDEV_PROJECT: "true"
-            LINES: "57"
+            LINES: "55"
             MYSQL_HISTFILE: /mnt/ddev-global-cache/mysqlhistory/projectst-web/mysql_history
             MYSQL_PWD: db
             NODE_EXTRA_CA_CERTS: /mnt/ddev-global-cache/mkcert/rootCA.pem
@@ -211,6 +211,11 @@ services:
               read_only: true
               source: /Users/nedanouri/Documents/01-Projekte/project/.ddev/xhprof
               target: /usr/local/bin/xhprof
+              type: bind
+            - bind:
+                create_host_path: true
+              source: /Users/nedanouri/Documents/01-Projekte/project/.git
+              target: /var/www/html/.git
               type: bind
             - source: ddev-global-cache
               target: /mnt/ddev-global-cache
