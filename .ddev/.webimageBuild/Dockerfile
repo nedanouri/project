@@ -27,5 +27,3 @@ RUN mkdir -p /home/$username && \
 
 ENV NVM_DIR=/home/$username/.nvm
 
-### DDEV-injected php folder permission fix
-RUN chmod 777 /run/php
