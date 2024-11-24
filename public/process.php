@@ -5,25 +5,13 @@ $username = 'db';
 $password = 'db';
 
 try {
+    ini_set('display_errors', 1);
+    ini_set('display_startup_errors', 1);
+    error_reporting(E_ALL);
+
     // اتصال به پایگاه داده با استفاده از PDO
     $conn = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-    // چک کردن وجود ردیف با id = 1
-    $check_row_sql = "SELECT COUNT(*) FROM site_statistics WHERE id = 1";
-    $check_row_result = $conn->query($check_row_sql);
-    $row_count = $check_row_result->fetchColumn();
-
-    if ($row_count == 0) {
-        // اگر ردیف وجود ندارد، ردیف جدید اضافه کنید
-        $insert_default_stats_sql = "INSERT INTO site_statistics (id, page_visits, form_submissions) VALUES (1, 0, 0)";
-        $conn->exec($insert_default_stats_sql);
-    }
-
-    // **افزایش تعداد بازدید صفحه** بدون شرط POST
-    $update_page_visits_sql = "UPDATE site_statistics SET page_visits = page_visits + 1 WHERE id = 1";
-    $update_page_visits_stmt = $conn->prepare($update_page_visits_sql);
-    $update_page_visits_stmt->execute();
 
     // بررسی اینکه آیا فرم ارسال شده است
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -33,38 +21,55 @@ try {
         $email = $_POST['email'];
         $phone = $_POST['phone'];
 
+        // گرفتن داده‌های ریکوئست از چک‌باکس‌ها
+        $requests = isset($_POST['request']) ? $_POST['request'] : [];
+
+        // تبدیل داده‌های ریکوئست به فرمت JSON
+        $requests_json = json_encode($requests);
+
         // وارد کردن داده‌ها به پایگاه داده (جدول users)
-        $sql = "INSERT INTO users (first_name, last_name, email, phone) VALUES (:first_name, :last_name, :email, :phone)";
+        $sql = "INSERT INTO users (first_name, last_name, email, phone, request) VALUES (:first_name, :last_name, :email, :phone, :request)";
         $stmt = $conn->prepare($sql);
-        $stmt->execute([
+        if (!$stmt->execute([
             ':first_name' => $first_name,
             ':last_name' => $last_name,
             ':email' => $email,
-            ':phone' => $phone
-        ]);
+            ':phone' => $phone,
+            ':request' => $requests_json
+        ])) {
+            var_dump($stmt->errorInfo());
+        }
 
-        // به‌روزرسانی آمار در جدول site_statistics
-        // افزایش تعداد فرم‌های ارسال شده
-        $update_form_submissions_sql = "UPDATE site_statistics SET form_submissions = form_submissions + 1 WHERE id = 1";
-        $update_form_submissions_stmt = $conn->prepare($update_form_submissions_sql);
-        $update_form_submissions_stmt->execute();
-    }
-
-    // دریافت آمار از پایگاه داده (برای نمایش تعداد فرم‌های ارسال شده و بازدیدها)
-    $sql = "SELECT form_submissions, page_visits FROM site_statistics WHERE id = 1";
-    $result = $conn->query($sql);
-
-    if ($result->rowCount() > 0) {
-        // گرفتن داده‌های آمار
+        // پس از ذخیره موفقیت آمیز، تعداد کل ثبت‌نام‌ها را دوباره بخوانید
+        $sql = "SELECT COUNT(*) AS form_submissions FROM users";
+        $result = $conn->query($sql);
         $row = $result->fetch(PDO::FETCH_ASSOC);
 
-        // ارسال داده‌ها به صورت JSON برای استفاده در JavaScript
-        echo json_encode($row);
+        // ارسال تعداد ثبت‌نام‌ها به صورت JSON
+        header('Content-Type: application/json');
+        if ($row) {
+            echo json_encode(['form_submissions' => $row['form_submissions']]);
+        } else {
+            echo json_encode(['form_submissions' => 0]);
+        }
+        exit;
+    }
+
+    // دریافت تعداد ثبت‌نام‌ها از جدول users
+    $sql = "SELECT COUNT(*) AS form_submissions FROM users";
+    $result = $conn->query($sql);
+    $row = $result->fetch(PDO::FETCH_ASSOC);
+
+    // ارسال داده‌ها به صورت JSON
+    header('Content-Type: application/json');
+    if ($row) {
+        echo json_encode(['form_submissions' => $row['form_submissions']]);
     } else {
-        echo json_encode(['form_submissions' => 0, 'page_visits' => 0]);
+        echo json_encode(['form_submissions' => 0]);
     }
 
 } catch (PDOException $e) {
-    echo "خطا: " . $e->getMessage();
+    header('Content-Type: application/json');
+    echo json_encode(['error' => $e->getMessage()]);
 }
 ?>

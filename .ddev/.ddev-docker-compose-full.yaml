@@ -22,7 +22,7 @@ services:
         command: []
         container_name: ddev-projectst-db
         environment:
-            COLUMNS: "245"
+            COLUMNS: "243"
             DDEV_DATABASE: mariadb:10.11
             DDEV_DATABASE_FAMILY: mysql
             DDEV_HOSTNAME: projectst.ddev.site
@@ -113,7 +113,7 @@ services:
             - /pre-start.sh
         container_name: ddev-projectst-web
         environment:
-            COLUMNS: "245"
+            COLUMNS: "243"
             COREPACK_HOME: /mnt/ddev-global-cache/corepack
             DDEV_COMPOSER_ROOT: /var/www/html
             DDEV_DATABASE: mariadb:10.11

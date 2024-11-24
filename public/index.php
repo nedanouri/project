@@ -1,100 +1,117 @@
 <!DOCTYPE html>
-<html lang="fa">
+<html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Responsive Template</title>
-
+    <title>Drehendes Bildkarussell mit Formular</title>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <style>
-        /* Reset some default styles */
+        /* Reset */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
-        /* Body and basic layout */
+        /* General Layout */
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            background-color: transparent;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .info-container {
+            width: 100%;
+            padding: 15px;
+            margin-top: 20px;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            color: #ff6600;
+        }
+
+        .info-text {
+            font-size: 1.2rem;
+            margin-right: 20px;
+        }
+
+        .carousel-container {
+            position: relative;
+            width: 100%;
+            height: 70vh;
+            overflow: hidden;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
         }
 
-        /* Container that holds both left and right sections */
-        .container {
-            display: flex;
-            width: 80%;
-            height: 80%;
-            max-width: 1200px;  /* Max width for large screens */
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        /* Left Section: 70% width for image and text */
-        .left {
-            width: 70%;
-            background-color: #fff;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: flex-start;
-        }
-
-        .left .image {
-            width: 100%;
+        .carousel-image {
+            position: absolute;
+            width: 40%;
             height: auto;
+            transition: transform 1s ease-in-out, opacity 1s ease-in-out;
+            z-index: 1;
+        }
+
+        .middle {
+            transform: scale(1.1);
+            z-index: 3;
+            box-shadow: 0 20px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .left {
+            transform: translateX(-80%);
+            opacity: 0.9;
+        }
+
+        .right {
+            transform: translateX(80%);
+            opacity: 0.9;
+        }
+
+        .carousel-text {
+            margin-top: 10px;
+            text-align: center;
+            font-size: 1.5rem;
+            color: #ff6600;
+            width: 80%;
+        }
+
+        .form-container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
             border-radius: 10px;
         }
 
-        .left .text h1 {
-            font-size: 2rem;
-            margin-top: 20px;
-            color: #333;
-        }
-
-        .left .text p {
-            font-size: 1rem;
-            color: #666;
-            margin-top: 10px;
-        }
-
-        /* Right Section: 30% width for the form */
-        .right {
-            width: 30%;
-            background-color: #ffffff;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            justify-content: center;
-            box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .right h2 {
+        .form-container h2 {
             font-size: 1.5rem;
             margin-bottom: 20px;
             color: #333;
         }
 
-        .right label {
-            font-size: 1rem;
+        .form-container label {
+            display: block;
             margin-top: 10px;
+            font-size: 1rem;
         }
 
-        .right input {
+        .form-container input, .form-container select {
             width: 100%;
             padding: 10px;
             margin-top: 5px;
             margin-bottom: 15px;
             border: 1px solid #ccc;
             border-radius: 5px;
+            font-size: 1rem;
         }
 
-        .right button {
+        .form-container button {
             width: 100%;
             padding: 12px;
             background-color: #4CAF50;
@@ -105,55 +122,32 @@
             cursor: pointer;
         }
 
-        .right button:hover {
+        .form-container button:hover {
             background-color: #45a049;
         }
 
-        /* Responsive Design for Tablets and Mobile */
-        @media screen and (max-width: 768px) {
-            .container {
-                flex-direction: column;
-                width: 100%;
-                height: auto;
-            }
-
-            .left, .right {
-                width: 100%;
-                padding: 15px;
-            }
-
-            .left .text h1 {
-                font-size: 1.5rem;
-            }
-
-            .right h2 {
-                font-size: 1.25rem;
-            }
-
-            .right input, .right button {
-                padding: 8px;
-            }
+        /* Select2 styling */
+        .select2-container {
+            width: 100% !important;
         }
 
-        @media screen and (max-width: 480px) {
-            .left .text h1 {
-                font-size: 1.2rem;
-            }
-
-            .left .text p {
-                font-size: 0.9rem;
-            }
-
-            .right h2 {
-                font-size: 1.1rem;
-            }
-
-            .right input, .right button {
-                padding: 6px;
-            }
+        .select2-container--default .select2-selection--multiple {
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 5px;
         }
 
-        /* Styles for the success message */
+        .select2-container--default .select2-selection--multiple .select2-selection__choice {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            padding: 2px 10px;
+            margin: 2px 5px 2px 0;
+            font-size: 0.9rem;
+        }
+
         .success-message {
             display: none;
             padding: 20px;
@@ -164,71 +158,108 @@
             margin-top: 20px;
         }
     </style>
+    <!-- Google reCAPTCHA -->
+    <script src="https://www.google.com/recaptcha/enterprise.js?render=6Lf6b4gqAAAAALyWv5xNUr9LecPzZNLX9WIjWL-r"></script>
 </head>
 <body>
 
-<div class="container">
-    <div class="left">
-        <!-- تغییر منبع تصویر به Image.jpg که داخل پوشه public قرار دارد -->
-        <img src="image.jpg" alt="Image" class="image">
-        <div class="text">
-            <h1>Welcome to Our Website</h1>
-            <p>This is a sample text to describe the page content. It can be anything you want to share with your visitors.</p>
-        </div>
-    </div>
-
-    <div class="right">
-        <h2>Contact Us</h2>
-        <form id="contact-form">
-            <label for="first_name">First Name:</label>
-            <input type="text" id="first_name" name="first_name" required><br>
-
-            <label for="last_name">Last Name:</label>
-            <input type="text" id="last_name" name="last_name" required><br>
-
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" required><br>
-
-            <label for="phone">Phone Number:</label>
-            <input type="tel" id="phone" name="phone" required><br>
-
-            <button type="submit">Submit</button>
-        </form>
-
-        <!-- Success message that will be shown after form submission -->
-        <div class="success-message" id="success-message">
-            اطلاعات شما با موفقیت ثبت شد! با شما تماس خواهیم گرفت.
-        </div>
+<!-- Top Info Section -->
+<div class="info-container">
+    <div class="info-text" id="registration-count">
+        Anzahl der vormerken: 0
     </div>
 </div>
 
+<!-- Carousel Section -->
+<div class="carousel-container">
+    <img src="image1.jpg" alt="Bild 1" class="carousel-image left">
+    <img src="image2.jpg" alt="Bild 2" class="carousel-image middle">
+    <img src="image3.jpg" alt="Bild 3" class="carousel-image right">
+</div>
+
+<!-- Carousel Text -->
+<div class="carousel-text">
+    JETZT VORMERKEN - WOHNEN BEIM KUTSCHKERMARKT
+</div>
+
+<!-- Form Section -->
+<div class="form-container" id="form-container">
+    <h2>vormerken</h2>
+    <form id="contact-form" method="post">
+        <label for="first_name">Vorname:</label>
+        <input type="text" id="first_name" name="first_name" required>
+
+        <label for="last_name">Nachname:</label>
+        <input type="text" id="last_name" name="last_name" required>
+
+        <label for="email">E-Mail:</label>
+        <input type="email" id="email" name="email" required>
+
+        <label for="phone">Telefonnummer:</label>
+        <input type="tel" id="phone" name="phone">
+
+        <label for="request">Anfragetyp:</label>
+        <select id="request" name="request[]" multiple="multiple">
+            <option value="Option 1">Option 1</option>
+            <option value="Option 2">Option 2</option>
+            <option value="Option 3">Option 3</option>
+            <option value="Option 4">Option 4</option>
+        </select>
+
+        <button type="submit">Absenden</button>
+    </form>
+</div>
+
+<div class="success-message" id="success-message">
+    Ihre Daten wurden erfolgreich gespeichert! Wir werden uns bei Ihnen melden.
+</div>
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
-    $(document).ready(function() {
-        // Submit form via AJAX
-        $('#contact-form').submit(function(e) {
-            e.preventDefault(); // Prevent default form submission
-
-            var formData = $(this).serialize(); // Serialize form data
-
-            // Send AJAX request
-            $.ajax({
-                url: 'process.php', // The PHP file that handles the form submission
-                type: 'POST',
-                data: formData,
-                success: function(response) {
-                    // On success, show the success message
-                    $('#success-message').fadeIn();
-
-                    // Optionally, hide the form after submission
-                    $('#contact-form').hide();
-
-                    // Optionally, reset the form (uncomment the next line if needed)
-                    // $('#contact-form')[0].reset();
-                }
-            });
+    $(document).ready(function () {
+        // Initialize Select2
+        $('#request').select2({
+            placeholder: "Wählen Sie Ihre Anfrage",
+            width: 'resolve'
         });
+
+        // Form submission
+        $('#contact-form').submit(function (e) {
+            e.preventDefault();
+
+            let formData = new FormData(e.target);
+
+            fetch('process.php', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    $('#form-container').hide();
+                    $('#success-message').show();
+
+                    setTimeout(() => {
+                        $('#success-message').hide();
+                    }, 60000);
+                })
+                .catch(error => console.error('Fehler beim Senden des Formulars:', error));
+        });
+
+        // Fetch registration count
+        fetch('process.php')
+            .then(response => response.json())
+            .then(data => {
+                $('#registration-count').text(`Anzahl der vormerken: ${data.form_submissions}`);
+            })
+            .catch(error => console.error('Fehler beim Abrufen der Statistik:', error));
     });
+    function onClick(e) {
+        e.preventDefault();
+        grecaptcha.enterprise.ready(async () => {
+            const token = await grecaptcha.enterprise.execute('6Lf6b4gqAAAAALyWv5xNUr9LecPzZNLX9WIjWL-r', {action: 'LOGIN'});
+        });
+    }
 </script>
 
 </body>
